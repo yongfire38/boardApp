@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {font-family: Arial, Helvetica, sans-serif;}
+* {box-sizing: border-box;}
+input[type=text], select, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 16px;
+    resize: vertical;
+}
+input[type=submit] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+input[type=submit]:hover {
+    background-color: #45a049;
+}
+.container {
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    padding: 20px;
+}
+</style>
+<script src="https://cdn.ckeditor.com/4.10.1/standard/ckeditor.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+//문서가 로드되면...
+$(function(){
+    //기존 textarea의 디자인을 교체...
+    CKEDITOR.replace("content");
+    $("#bt_edit").click(function(){
+        $("form").attr("action","/board/edit");//수정요청 url
+        $("form").submit();//전송!!        
+    });    
+    //삭제 이벤트 구현
+    //ajax 를 구현하는 방법 
+    //1.순수 자바스크립트 문법을 사용하는 법
+    //   XMLHttpRequest 객체와 이벤트를 일일이 처리
+    //2.JQuery가 지원하는 Ajax를 이용하는 법
+    $("#bt_del").click(function(){
+        //현재 글을 삭제해달라고 요청하되, 비동기로...
+        var notice_id = $("#notice_id").val();
+
+        $.ajax({
+            url:"/board/delete",
+            type:"get",
+            data:{
+                notice_id:notice_id
+            },
+            success:function(data){
+                if(data.result=="0"){
+                    alert("실패");
+                }else{
+                    alert("성공");
+                    location.href="/board/list";
+                }          
+            }
+        });        
+    });
+});
+</script>    
+</head>
+<body bgcolor="yellow">
+    <h3>Contact Form</h3>
+
+    <div class="container">
+        <form method="post">
+            <input type="hidden" name="notice_id" id="notice_id"  value="<%=row.notice_id%>">
+            
+            <label for="fname">작성자</label>
+            <input type="text" id="writer" name="writer" value="<%=row.writer%>">
+
+            <label for="lname">제목</label>
+            <input type="text" id="title" name="title" value="<%=row.title%>">
+
+
+            <label for="subject">내용</label>
+            <textarea id="content" name="content" style="height:200px"><%=row.content%></textarea>
+
+            <input type="button" value="수정" id="bt_edit">
+            <input type="button" value="삭제" id="bt_del">
+            <input type="button" value="목록" id="bt_list">
+
+        </form>
+    </div>
+
+</body>
+
+</html>
